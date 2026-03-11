@@ -622,28 +622,6 @@ export default function ProductsPage() {
                     </button>
                   </div>
                 )}
-                {/* Row 3 */}
-                <div className="flex gap-2">
-                  <button
-                    onClick={() => handleCreateMarketplaceProduct(product.id)}
-                    disabled={creatingMarketplaceProductId === product.id || !product.is_active}
-                    className={`flex-1 py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1 transition-colors ${!product.is_active ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-purple-50 text-purple-700 hover:bg-purple-100'}`}
-                  >
-                    {creatingMarketplaceProductId === product.id ? <Loader2 className="h-3 w-3 animate-spin" /> : <><Plus className="h-3 w-3" /> Marketplace</>}
-                  </button>
-                  <button
-                    onClick={() => handleOpenDiscountModal(product)}
-                    className="flex-1 bg-yellow-50 text-yellow-700 py-2 rounded-lg hover:bg-yellow-100 transition-colors text-xs font-medium flex items-center justify-center gap-1"
-                  >
-                    <Tag className="h-3 w-3" /> Discount
-                  </button>
-                  <Link
-                    href={`/inventory-analytics/products/${product.id}`}
-                    className="flex-1 bg-indigo-50 text-indigo-700 py-2 rounded-lg hover:bg-indigo-100 transition-colors text-xs font-medium flex items-center justify-center"
-                  >
-                    📊 Analytics
-                  </Link>
-                </div>
               </div>
             </div>
           ))}
