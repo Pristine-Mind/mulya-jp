@@ -69,6 +69,12 @@ export default function Navigation() {
       
       <div className="flex items-center gap-3 sm:gap-4">
         <button 
+          onClick={() => router.push('/login')}
+          className="hidden sm:block bg-transparent text-slate border border-slate/30 px-4 sm:px-5 py-2 sm:py-2.5 font-medium text-xs sm:text-sm cursor-pointer tracking-wide transition-all duration-200 hover:border-vermilion hover:text-vermilion"
+        >
+          Login
+        </button>
+        <button 
           onClick={() => scrollToSection('register')}
           className="hidden sm:block bg-vermilion text-white border-none px-4 sm:px-6 py-2 sm:py-2.5 font-medium text-xs sm:text-sm cursor-pointer tracking-wide transition-all duration-200 hover:bg-deep-red hover:-translate-y-0.5"
         >
@@ -102,6 +108,14 @@ export default function Navigation() {
       {isMenuOpen && (
         <div className="absolute top-full left-0 right-0 bg-cream border-b border-vermilion/15 md:hidden">
           <ul className="flex flex-col p-6 space-y-4">
+            <li>
+              <button 
+                onClick={() => { router.push('/login'); setIsMenuOpen(false); }}
+                className="text-slate text-sm font-medium tracking-wide hover:text-vermilion"
+              >
+                Login
+              </button>
+            </li>
             <li>
               <button 
                 onClick={() => {scrollToSection('features'); setIsMenuOpen(false);}}

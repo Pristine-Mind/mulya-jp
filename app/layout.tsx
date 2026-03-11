@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Noto_Sans_JP, Space_Mono } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "./components/context/ToastContext";
+import { AuthProvider } from "./components/context/AuthContext";
 
 const notoSansJP = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
@@ -34,9 +35,11 @@ export default function RootLayout({
       <body
         className={`${notoSansJP.variable} ${spaceMono.variable} antialiased`}
       >
-        <ToastProvider>
-          {children}
-        </ToastProvider>
+        <AuthProvider>
+          <ToastProvider>
+            {children}
+          </ToastProvider>
+        </AuthProvider>
       </body>
     </html>
   );
