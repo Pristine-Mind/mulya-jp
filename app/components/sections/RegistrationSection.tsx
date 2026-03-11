@@ -2,14 +2,12 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useForm, SubmitHandler, Resolver } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { useToast } from '../context/ToastContext';
 import { businessRegistrationAPI } from '../../services/businessRegistration';
 import { BusinessRegistrationRequest, Prefecture, BusinessCategory } from '../../types/business-registration';
-
-type FormData = BusinessRegistrationRequest;
 
 const prefectures: Prefecture[] = [
   { value: '', label: 'Select Prefecture' },
@@ -108,9 +106,9 @@ const schema = yup.object({
     .min(2, 'Business name must be at least 2 characters')
     .max(100, 'Business name cannot exceed 100 characters'),
   corporate_number: yup.string()
+    .transform(value => value === '' ? undefined : value)
     .matches(/^[0-9]{13}$/, 'Corporate number must be exactly 13 digits')
-    .nullable()
-    .transform(value => value === '' ? null : value),
+    .optional(),
   prefecture: yup.string()
     .required('Prefecture is required')
     .notOneOf([''], 'Please select a prefecture'),
@@ -118,12 +116,16 @@ const schema = yup.object({
     .required('Business category is required')
     .notOneOf([''], 'Please select a business category'),
   invoice_registration_number: yup.string()
+    .transform(value => value === '' ? undefined : value)
     .matches(/^T[0-9]{13}$/, 'Invoice registration number must be in format T followed by 13 digits')
-    .nullable()
-    .transform(value => value === '' ? null : value),
+    .optional(),
   business_overview: yup.string()
-    .max(500, 'Business overview cannot exceed 500 characters'),
+    .transform(value => value === '' ? undefined : value)
+    .max(500, 'Business overview cannot exceed 500 characters')
+    .optional(),
 }).required();
+
+type FormData = yup.InferType<typeof schema>;
 
 const complianceItems = [
   'Food Hygiene Law & JAS Law compliant product management system',
@@ -146,7 +148,7 @@ export default function RegistrationSection() {
     formState: { errors },
     reset,
   } = useForm<FormData>({
-    resolver: yupResolver(schema),
+    resolver: yupResolver(schema) as unknown as Resolver<FormData>,
     defaultValues: {
       username: '',
       email: '',
@@ -156,11 +158,8 @@ export default function RegistrationSection() {
       last_name: '',
       phone_number: '',
       registered_business_name: '',
-      corporate_number: '',
       prefecture: '',
       business_category: '',
-      invoice_registration_number: '',
-      business_overview: '',
     },
   });
 
@@ -168,7 +167,25 @@ export default function RegistrationSection() {
     setIsSubmitting(true);
 
     try {
-      const result = await businessRegistrationAPI.register(data);
+      // Convert form data to API request format
+      const apiData: BusinessRegistrationRequest = {
+        username: data.username,
+        email: data.email,
+        password: data.password,
+        password2: data.password2,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        phone_number: data.phone_number,
+        registered_business_name: data.registered_business_name,
+        prefecture: data.prefecture,
+        business_category: data.business_category,
+        // Only include optional fields if they have values
+        ...(data.corporate_number && { corporate_number: data.corporate_number }),
+        ...(data.invoice_registration_number && { invoice_registration_number: data.invoice_registration_number }),
+        ...(data.business_overview && { business_overview: data.business_overview }),
+      };
+
+      const result = await businessRegistrationAPI.register(apiData);
 
       // Success handling
       showSuccess(
